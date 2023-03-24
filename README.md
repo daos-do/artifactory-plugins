@@ -1,0 +1,1 @@
+# Artifactory Plugins for ESAD
