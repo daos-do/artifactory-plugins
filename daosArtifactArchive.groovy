@@ -118,13 +118,13 @@ File configFile = new File(ctx.artifactoryHome.etcDir, CONFIG_FILE_PATH)
 if (configFile.exists()) {
     // groovylint-disable-next-line NoDef, VariableTypeRequired
     def config = new JsonSlurper().parse(configFile.toURL())
-    log.info "Schedule job policy list: $config.policies"
+    log.info "Schedule job policy list: ${config.policies}"
 
     int count = 1
     config.policies.each { policySettings ->
         // groovylint-disable-next-line DuplicateListLiteral
         String cron = policySettings.containsKey('cron') ? policySettings.cron as String : ['0 23 * * * ?']
-        String repos[] = policySettings.containsKey('repos') ? policySettings.repos as String[] : null
+        String[] repos = policySettings.containsKey('repos') ? policySettings.repos as String[] : null
         String timeUnit = policySettings.containsKey('timeUnit') ? policySettings.timeUnit as String : DEFAULT_TIME_UNIT
         int timeInterval = policySettings.containsKey('timeInterval') ? policySettings.timeInterval as int : DEFAULT_TIME_INTERVAL
         int paceTimeMS = policySettings.containsKey('paceTimeMS') ? policySettings.paceTimeMS as int : 0
@@ -136,7 +136,7 @@ if (configFile.exists()) {
         cancelOnNullRepos(repos, 'repos parameter must be specified for cron jobs to be scheduled.')
 
         jobs {
-            "scheduledCleanup_$count"(cron: cron) {
+            "daosArtifactArchive_$count"(cron: cron) {
                 log.info "Policy settings for scheduled run at($cron): repo list($repos), timeUnit($timeUnit), timeInterval($timeInterval), paceTimeMS($paceTimeMS) dryrun($dryRun) disablePropertiesSupport($disablePropertiesSupport)"
                 artifactCleanup(timeUnit, timeInterval, repos, log, paceTimeMS, dryRun, disablePropertiesSupport)
             }
